@@ -1,5 +1,6 @@
 # database.py
 import os
+import ssl
 from pymongo import MongoClient
 from datetime import datetime
 
@@ -12,16 +13,23 @@ class Database:
         if not mongodb_uri:
             print("⚠️ MONGODB_URI not set, using localhost (development mode)")
             mongodb_uri = 'mongodb://localhost:27017/'
+            self.client = MongoClient(mongodb_uri)
+        else:
+            # For production (MongoDB Atlas), add SSL configuration
+            print(f"✅ Connecting to MongoDB Atlas...")
+            self.client = MongoClient(
+                mongodb_uri,
+                tls=True,
+                tlsAllowInvalidCertificates=True  # Required for some Atlas setups
+            )
         
-        # Connect to MongoDB
-        self.client = MongoClient(mongodb_uri)
         self.db = self.client['dermacare_db']
         self.users = self.db['users']
         self.products = self.db['products']
         
         # Create index on email for faster lookup
         self.users.create_index('email', unique=True)
-        print(f"✅ Connected to MongoDB (host: {mongodb_uri[:30]}...)")
+        print("✅ Connected to MongoDB successfully")
     
     def get_user(self, email):
         return self.users.find_one({'email': email})
