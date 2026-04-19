@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis History | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .history-page {
+            background: var(--gradient-bg);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 20px;
+        }
+        
+        /* Header Animation */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .header h1 {
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+        }
+        
+        .header p {
+            color: var(--taupe);
+            font-size: 0.85rem;
+        }
+        
+        .clear-btn {
+            background: transparent;
+            border: 1px solid #E76F51;
+            color: #E76F51;
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .clear-btn:hover {
+            background: #E76F51;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Stats Row - Small & Aesthetic */
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+            border: 1px solid rgba(198, 164, 59, 0.1);
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--taupe);
+            font-size: 0.7rem;
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* History List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .history-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+            transition: all 0.3s;
+            cursor: pointer;
+            animation: slideInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .history-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .history-date {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--taupe);
+            font-size: 0.7rem;
+        }
+        
+        .type-badge {
+            padding: 0.2rem 0.8rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .type-badge.skin {
+            background: rgba(198, 164, 59, 0.1);
+            color: var(--gold);
+        }
+        
+        .type-badge.hair {
+            background: rgba(198, 164, 59, 0.1);
+            color: var(--gold);
+        }
+        
+        .severity-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+        
+        .severity-mild {
+            background: rgba(46, 125, 50, 0.1);
+            color: #2E7D32;
+        }
+        
+        .severity-moderate {
+            background: rgba(245, 124, 0, 0.1);
+            color: #F57C00;
+        }
+        
+        .severity-severe {
+            background: rgba(211, 47, 47, 0.1);
+            color: #D32F2F;
+        }
+        
+        .conditions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .condition-tag {
+            background: rgba(198, 164, 59, 0.08);
+            color: var(--deep-teal);
+            padding: 0.2rem 0.7rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+        }
+        
+        .products-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(198, 164, 59, 0.1);
+        }
+        
+        .product-tag {
+            background: rgba(198, 164, 59, 0.05);
+            color: var(--taupe);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+        }
+        
+        .view-details {
+            color: var(--gold);
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(198, 164, 59, 0.1);
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: var(--deep-teal);
+            margin-bottom: 0.3rem;
+            font-size: 1.2rem;
+        }
+        
+        .empty-state p {
+            color: var(--taupe);
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            animation: scaleIn 0.3s ease-out;
+        }
+        
+        .modal-content h3 {
+            color: var(--deep-teal);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .stats-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="history-page">
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-dermacare.png') }}" alt="DermaCare">
+            <span>DERMACARE</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analyze">Analysis</a>
+            <a href="/recommendations">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/skin-coach">Coach</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/history" class="active">History</a>
+            <a href="/logout" style="color: #E76F51;">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Analysis History</h1>
+                <p>View all your previous skin and hair analyses</p>
+            </div>
+            {% if history and history|length > 0 %}
+            <button class="clear-btn" onclick="showClearModal()">🗑️ Clear All</button>
+            {% endif %}
+        </div>
+        
+        <!-- Stats Section - Small & Aesthetic -->
+        {% if history and history|length > 0 %}
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">{{ history|length }}</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% set skin_count = history|selectattr('type', 'equalto', 'skin')|list|length %}
+                    {{ skin_count }}
+                </div>
+                <div class="stat-label">Skin</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% set hair_count = history|selectattr('type', 'equalto', 'hair')|list|length %}
+                    {{ hair_count }}
+                </div>
+                <div class="stat-label">Hair</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- History List -->
+        <div class="history-list">
+            {% if history and history|length > 0 %}
+                {% for item in history %}
+                <div class="history-card" onclick="viewAnalysis({{ loop.index0 }})" style="animation-delay: {{ 0.1 + loop.index0 * 0.03 }}s;">
+                    <div class="history-header">
+                        <div class="history-date">
+                            <span>📅</span>
+                            <span>{{ item.date }}</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span class="type-badge {% if item.type == 'skin' %}skin{% else %}hair{% endif %}">
+                                {% if item.type == 'skin' %}🧴 Skin{% else %}💇 Hair{% endif %}
+                            </span>
+                            <span class="severity-badge severity-{{ item.severity }}">
+                                {% if item.severity == 'mild' %}Mild
+                                {% elif item.severity == 'moderate' %}Moderate
+                                {% else %}Severe{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="conditions-list">
+                        {% for condition in item.conditions %}
+                            <span class="condition-tag">{{ condition }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if item.products and item.products|length > 0 %}
+                    <div class="products-preview">
+                        <span style="font-size: 0.6rem; color: var(--taupe);">Recommended:</span>
+                        {% for product in item.products[:2] %}
+                            <span class="product-tag">{{ product }}</span>
+                        {% endfor %}
+                        {% if item.products|length > 2 %}
+                            <span class="product-tag">+{{ item.products|length - 2 }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="view-details">
+                        Click to view details →
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>No History Yet</h3>
+                    <p>Your previous skin and hair analyses will appear here.</p>
+                    <a href="/analyze" class="btn btn-primary" style="display: inline-block; margin-top: 0.5rem;">Start Analysis →</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Clear History Modal -->
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <h3>Clear All History?</h3>
+            <p style="color: var(--taupe); font-size: 0.85rem;">This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" style="background: #E76F51;" onclick="clearHistory()">Clear All</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>© 2026 DermaCare AI — AI-Powered Skin & Hair Analysis</p>
+    </footer>
+    
+    <script>
+        function viewAnalysis(index) {
+            fetch('/view-analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ index: index })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/results';
+                } else {
+                    alert('Could not load analysis details');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading analysis');
+            });
+        }
+        
+        function showClearModal() {
+            document.getElementById('clearModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('clearModal').style.display = 'none';
+        }
+        
+        function clearHistory() {
+            fetch('/clear-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Could not clear history');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error clearing history');
+            });
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('clearModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

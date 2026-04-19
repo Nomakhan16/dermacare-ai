@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin & Hair Analysis | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 20px; }
+        .page-header { text-align: center; margin-bottom: 2rem; animation: fadeInUp 0.6s ease-out; }
+        .page-header h1 { background: linear-gradient(135deg, #1A3B35, #C6A43B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .type-tabs { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; }
+        .type-tab { padding: 0.7rem 1.8rem; border-radius: 50px; cursor: pointer; font-weight: 600; background: white; border: 1.5px solid rgba(198,164,59,0.2); color: #8A7E6E; transition: all 0.3s; }
+        .type-tab.active { background: linear-gradient(135deg, #1A3B35, #C6A43B); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(198,164,59,0.2); }
+        .upload-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .upload-card { background: white; border-radius: 20px; padding: 1.8rem; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(198,164,59,0.1); }
+        .upload-card:hover { transform: translateY(-5px); border-color: #C6A43B; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .camera-section, .gallery-section { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(198,164,59,0.1); }
+        #video { width: 100%; max-width: 500px; border-radius: 12px; margin: 0 auto; display: block; background: #1a1a2e; border: 2px solid #C6A43B; }
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .image-card { background: #F5F0E8; border-radius: 12px; padding: 0.8rem; text-align: center; position: relative; border: 1px solid rgba(198,164,59,0.1); }
+        .image-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+        .remove-btn { position: absolute; top: 5px; right: 5px; background: #E76F51; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; }
+        .add-more-btn { background: rgba(198,164,59,0.05); border: 2px dashed #C6A43B; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; }
+        .analyze-btn-container { text-align: center; margin: 1.5rem 0; }
+        .analyze-btn { background: linear-gradient(135deg, #1A3B35, #C6A43B); color: white; border: none; padding: 0.8rem 2.5rem; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; display: none; }
+        .loading-screen { background: white; border-radius: 20px; padding: 2rem; text-align: center; margin: 1.5rem 0; display: none; }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(198,164,59,0.2); border-top-color: #C6A43B; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-bar { width: 100%; height: 4px; background: rgba(198,164,59,0.1); border-radius: 2px; margin: 1rem 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #1A3B35, #C6A43B); width: 0%; transition: width 0.3s; }
+        @media (max-width: 768px) { .upload-options { grid-template-columns: 1fr; } .type-tabs { flex-direction: column; align-items: center; } .type-tab { width: 100%; text-align: center; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='images/logo-dermacare.png') }}"><span>DERMACARE</span></div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analyze" class="active">Analysis</a>
+            <a href="/recommendations">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/skin-coach">Coach</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/history">History</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Skin & Hair Analysis</h1>
+            <p>Upload photos of your face or scalp for AI-powered analysis</p>
+        </div>
+
+        <div class="type-tabs">
+            <div class="type-tab active" onclick="selectType('skin')">🧴 Skin Analysis</div>
+            <div class="type-tab" onclick="selectType('hair')">💇 Hair Analysis</div>
+        </div>
+
+        <div class="upload-options" id="optionCards">
+            <div class="upload-card" onclick="showCamera()"><div class="upload-icon">📷</div><h3>Use Camera</h3><p>Take photos directly</p></div>
+            <div class="upload-card" onclick="showUpload()"><div class="upload-icon">📁</div><h3>Upload Photos</h3><p>Select from gallery</p></div>
+        </div>
+
+        <div id="cameraSection" class="camera-section" style="display: none;">
+            <h3>📷 Take Photo</h3>
+            <video id="video" autoplay></video>
+            <div class="btn-group" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="capturePhoto()">📸 Capture</button>
+                <button class="btn btn-outline" onclick="stopCamera()">Stop</button>
+                <button class="btn btn-outline" onclick="showOptions()">← Back</button>
+            </div>
+        </div>
+
+        <div id="gallerySection" class="gallery-section" style="display: none;">
+            <h3>📸 Your Images</h3>
+            <div class="image-grid" id="imageGrid"></div>
+            <div class="add-more-btn" onclick="showAddOptions()"><div style="font-size: 1.5rem;">➕</div><p>Add More Photos</p></div>
+        </div>
+
+        <div class="analyze-btn-container">
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImages()">🔍 Analyze My Images</button>
+        </div>
+
+        <div id="loading" class="loading-screen">
+            <div class="spinner"></div>
+            <h3 id="loadingTitle">AI is analyzing...</h3>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+    </div>
+
+    <footer class="footer"><p>© 2026 DermaCare AI — AI-Powered Skin & Hair Analysis</p></footer>
+
+    <script>
+        let imageFiles = [], videoStream = null, progressInterval, analysisType = 'skin';
+
+        function selectType(type) {
+            analysisType = type;
+            document.querySelectorAll('.type-tab').forEach(tab => tab.classList.remove('active'));
+            if (type === 'skin') {
+                document.querySelector('.type-tab:first-child').classList.add('active');
+                document.getElementById('loadingTitle').innerHTML = 'AI is analyzing your skin...';
+            } else {
+                document.querySelector('.type-tab:last-child').classList.add('active');
+                document.getElementById('loadingTitle').innerHTML = 'AI is analyzing your hair...';
+            }
+            showOptions();
+        }
+
+        function showOptions() {
+            document.getElementById('optionCards').style.display = 'grid';
+            document.getElementById('cameraSection').style.display = 'none';
+            document.getElementById('gallerySection').style.display = 'none';
+            document.getElementById('analyzeBtn').style.display = 'none';
+            stopCamera();
+        }
+
+        function showGallery() {
+            document.getElementById('optionCards').style.display = 'none';
+            document.getElementById('cameraSection').style.display = 'none';
+            document.getElementById('gallerySection').style.display = 'block';
+            updateGalleryDisplay();
+            document.getElementById('analyzeBtn').style.display = imageFiles.length >= 1 ? 'block' : 'none';
+        }
+
+        function showAddOptions() {
+            document.getElementById('cameraSection').style.display = 'none';
+            document.getElementById('optionCards').style.display = 'grid';
+        }
+
+        function showCamera() {
+            document.getElementById('optionCards').style.display = 'none';
+            document.getElementById('cameraSection').style.display = 'block';
+            document.getElementById('gallerySection').style.display = 'none';
+            startCamera();
+        }
+
+        function showUpload() {
+            document.getElementById('optionCards').style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.onchange = (e) => handleFiles(e.target.files);
+            input.click();
+        }
+
+        async function startCamera() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = videoStream;
+            } catch(err) { alert('Please allow camera access'); showOptions(); }
+        }
+
+        function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob(blob => {
+                imageFiles.push(new File([blob], `camera_${Date.now()}.jpg`, { type: 'image/jpeg' }));
+                showGallery();
+            }, 'image/jpeg');
+        }
+
+        function handleFiles(files) { for (let file of files) imageFiles.push(file); showGallery(); }
+
+        function updateGalleryDisplay() {
+            const grid = document.getElementById('imageGrid');
+            grid.innerHTML = '';
+            imageFiles.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.innerHTML = `<button class="remove-btn" onclick="removeImage(${idx})">✖</button><img src="${e.target.result}"><div style="margin-top: 0.3rem;">Photo ${idx+1}</div>`;
+                    grid.appendChild(card);
+                };
+                reader.readAsDataURL(file);
+            });
+            document.getElementById('analyzeBtn').style.display = imageFiles.length >= 1 ? 'block' : 'none';
+        }
+
+        function removeImage(idx) { imageFiles.splice(idx, 1); updateGalleryDisplay(); if (imageFiles.length === 0) showOptions(); }
+
+        function analyzeImages() {
+            if (imageFiles.length === 0) { alert('Please add at least one photo'); return; }
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analyzeBtn').style.display = 'none';
+            document.getElementById('optionCards').style.display = 'none';
+            document.getElementById('cameraSection').style.display = 'none';
+            document.getElementById('gallerySection').style.display = 'none';
+            stopCamera();
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 90) progress = 90;
+                document.getElementById('progressFill').style.width = progress + '%';
+            }, 500);
+            const formData = new FormData();
+            formData.append('image', imageFiles[0]);
+            formData.append('type', analysisType);
+            fetch('/analyze/upload', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    clearInterval(progressInterval);
+                    if (data.success) {
+                        document.getElementById('progressFill').style.width = '100%';
+                        setTimeout(() => window.location.href = '/results', 500);
+                    } else {
+                        alert(data.error || 'Analysis failed');
+                        showOptions();
+                        document.getElementById('loading').style.display = 'none';
+                    }
+                })
+                .catch(() => { clearInterval(progressInterval); showOptions(); document.getElementById('loading').style.display = 'none'; alert('Server error'); });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => showOptions());
+        window.addEventListener('beforeunload', () => stopCamera());
+    </script>
+</body>
+</html>

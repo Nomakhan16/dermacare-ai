@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Welcome Banner */
+        .welcome-banner {
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .welcome-banner h1 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .welcome-banner p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+        
+        /* Stats Row - Small & Aesthetic */
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+            border: 1px solid rgba(198, 164, 59, 0.1);
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.15s; }
+        .stat-item:nth-child(3) { animation-delay: 0.2s; }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--taupe);
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Section Title */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--deep-teal);
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        /* Quick Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(198, 164, 59, 0.1);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .action-card:nth-child(1) { animation-delay: 0.25s; }
+        .action-card:nth-child(2) { animation-delay: 0.3s; }
+        .action-card:nth-child(3) { animation-delay: 0.35s; }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .action-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+            color: var(--deep-teal);
+        }
+        
+        .action-card p {
+            color: var(--taupe);
+            font-size: 0.75rem;
+        }
+        
+        /* Recent Activity */
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .recent-item {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+            transition: all 0.3s;
+            animation: slideInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .recent-item:nth-child(1) { animation-delay: 0.4s; }
+        .recent-item:nth-child(2) { animation-delay: 0.45s; }
+        .recent-item:nth-child(3) { animation-delay: 0.5s; }
+        
+        .recent-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .recent-date {
+            color: var(--taupe);
+            font-size: 0.7rem;
+        }
+        
+        .status-badge {
+            background: rgba(198, 164, 59, 0.1);
+            color: var(--gold);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        
+        .recent-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .condition-badge {
+            background: rgba(198, 164, 59, 0.08);
+            color: var(--deep-teal);
+            padding: 0.2rem 0.7rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+        }
+        
+        .empty-state {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(198, 164, 59, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-dermacare.png') }}" alt="DermaCare">
+            <span>DERMACARE</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/analyze">Analysis</a>
+            <a href="/recommendations">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/skin-coach">Coach</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/history">History</a>
+            
+            <a href="/logout" style="color: #E76F51;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h1>Welcome back, {{ user.name }} ✨</h1>
+            <p>Your skin health journey continues. Ready for today's analysis?</p>
+        </div>
+        
+        <!-- Stats Row - Small & Aesthetic -->
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-number">{{ history|length if history else 0 }}</div>
+                <div class="stat-label">Analyses</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ user.skin_type }}</div>
+                <div class="stat-label">Skin Type</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">94%</div>
+                <div class="stat-label">AI Accuracy</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="section-title">Quick Actions</div>
+        <div class="actions-grid">
+            <a href="/analyze" class="action-card">
+                <div class="action-icon">📸</div>
+                <h3>New Analysis</h3>
+                <p>Upload photos for AI analysis</p>
+            </a>
+            <a href="/recommendations" class="action-card">
+                <div class="action-icon">💊</div>
+                <h3>View Products</h3>
+                <p>Personalized recommendations</p>
+            </a>
+            <a href="/chatbot" class="action-card">
+                <div class="action-icon">🤖</div>
+                <h3>AI Assistant</h3>
+                <p>Ask skincare questions</p>
+            </a>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="section-title">Recent Activity</div>
+        
+        {% if history and history|length > 0 %}
+        <div class="recent-list">
+            {% for item in history[:3] %}
+            <div class="recent-item">
+                <div class="recent-header">
+                    <span class="recent-date">📅 {{ item.date }}</span>
+                    <span class="status-badge">✓ Complete</span>
+                </div>
+                <div class="recent-conditions">
+                    {% for condition in item.conditions %}
+                    <span class="condition-badge">{{ condition }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p style="color: var(--taupe);">No analyses yet. Start your first analysis!</p>
+            <a href="/analyze" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">Start Analysis →</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 DermaCare AI — AI-Powered Skin & Hair Analysis</p>
+    </footer>
+</body>
+</html>

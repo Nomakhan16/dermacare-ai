@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results | DermaCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .results-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-title {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .result-date {
+            color: var(--taupe);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Type Badge - NEW for Skin/Hair */
+        .type-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .skin-badge {
+            background: #E8F3ED;
+            color: #2E7D32;
+        }
+        
+        .hair-badge {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+        
+        .condition-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--beige);
+            border-radius: var(--radius-md);
+        }
+        
+        .condition-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .condition-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        
+        .condition-tag {
+            background: white;
+            color: var(--primary-dark);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--primary-light);
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            margin: 1rem 0;
+        }
+        
+        .severity-mild {
+            background: #E8F3ED;
+            color: #2E7D32;
+        }
+        
+        .severity-moderate {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+        
+        .severity-severe {
+            background: #FFE5E5;
+            color: #D32F2F;
+        }
+        
+        .product-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .product-mini-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--primary-light);
+            text-align: left;
+            transition: transform 0.3s;
+        }
+        
+        .product-mini-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .product-mini-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .product-mini-card .brand {
+            color: var(--taupe);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-mini-card .ingredients {
+            color: var(--charcoal);
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+        }
+        
+        .product-mini-card .target {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .share-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--primary-light);
+        }
+        
+        .share-section p {
+            color: var(--taupe);
+            margin-bottom: 1rem;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .share-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .no-results h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .no-results p {
+            color: var(--taupe);
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .result-card {
+                padding: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+            
+            .product-preview {
+                grid-template-columns: 1fr;
+            }
+            
+            .condition-tags {
+                gap: 0.5rem;
+            }
+            
+            .condition-tag {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-dermacare.png') }}" alt="DermaCare">
+            <span>DERMACARE</span>
+        </div>
+        <div class="nav-links">
+             <a href="/dashboard">Dashboard</a>
+            <a href="/analyze">Analysis</a>
+            <a href="/recommendations" class="active">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/skin-coach">Coach</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/progress">Progress</a>
+            <a href="/history">History</a>
+           
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="results-container">
+        {% if results %}
+        <div class="result-card">
+            <div class="result-icon">
+                {% if results.type == 'skin' %}🧴{% else %}💇{% endif %}
+            </div>
+            
+            <!-- Type Badge (Skin or Hair) -->
+            <div class="type-badge {% if results.type == 'skin' %}skin-badge{% else %}hair-badge{% endif %}">
+                {% if results.type == 'skin' %}🧴 Skin Analysis{% else %}💇 Hair Analysis{% endif %}
+            </div>
+            
+            <h1 class="result-title">Analysis Complete!</h1>
+            <div class="result-date">{{ results.date if results.date else 'Just now' }}</div>
+            
+            <!-- Severity Badge -->
+            {% if results.severity == 'mild' %}
+                <div class="severity-badge severity-mild">🌟 Mild Condition - Good!</div>
+            {% elif results.severity == 'moderate' %}
+                <div class="severity-badge severity-moderate">📊 Moderate - Needs Attention</div>
+            {% elif results.severity == 'severe' %}
+                <div class="severity-badge severity-severe">⚠️ Severe - Take Action</div>
+            {% else %}
+                <div class="severity-badge severity-moderate">📊 Analysis Complete</div>
+            {% endif %}
+            
+            <!-- Detected Conditions -->
+            <div class="condition-section">
+                <h3>🔍 Detected 
+                    {% if results.type == 'skin' %}Skin Conditions{% else %}Hair Issues{% endif %}
+                </h3>
+                {% if results.conditions and results.conditions|length > 0 %}
+                <div class="condition-tags">
+                    {% for condition in results.conditions %}
+                        <span class="condition-tag">{{ condition }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: var(--taupe);">
+                    {% if results.type == 'skin' %}Your skin looks great!{% else %}Your hair looks healthy!{% endif %}
+                </p>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Product Preview -->
+            {% if results.products and results.products|length > 0 %}
+            <h3 style="margin-bottom: 1.5rem;">
+                {% if results.type == 'skin' %}💊 Recommended Skincare{% else %}💇 Recommended Haircare{% endif %}
+            </h3>
+            <div class="product-preview">
+                {% for product in results.products[:3] %}
+                <div class="product-mini-card">
+                    <h4>{{ product.name }}</h4>
+                    <div class="brand">{{ product.brand }}</div>
+                    <div class="ingredients">
+                        {% if product.ingredients %}
+                            {{ product.ingredients[:60] }}{% if product.ingredients|length > 60 %}...{% endif %}
+                        {% else %}
+                            Key ingredients not specified
+                        {% endif %}
+                    </div>
+                    <span class="target">✓ Targets: {{ product.for }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if results.products|length > 3 %}
+            <p style="color: var(--taupe); margin: 1rem 0;">
+                + {{ results.products|length - 3 }} more products available
+            </p>
+            {% endif %}
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/recommendations" class="btn btn-primary">View All Products →</a>
+                <a href="/analyze" class="btn btn-outline" onclick="resetAnalysis()">New Analysis</a>
+            </div>
+            
+            <!-- Share Results -->
+            <div class="share-section">
+                <p>Share your results</p>
+                <div class="share-buttons">
+                    <button class="share-btn" onclick="shareResults('twitter')">𝕏</button>
+                    <button class="share-btn" onclick="shareResults('facebook')">f</button>
+                    <button class="share-btn" onclick="shareResults('copy')">📋</button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- No Results Found -->
+        <div class="no-results">
+            <div class="no-results-icon">📸</div>
+            <h3>No Analysis Results</h3>
+            <p>You haven't completed a skin or hair analysis yet.</p>
+            <a href="/analyze" class="btn btn-primary">Start New Analysis →</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <footer class="footer">
+        <p>© 2026 DermaCare AI - Intelligent Skin & Hair Analysis</p>
+    </footer>
+    
+    <script>
+        function resetAnalysis() {
+            // Clear any stored data
+            sessionStorage.clear();
+            localStorage.clear();
+            
+            // Also clear any analysis data from the current session
+            fetch('/clear-analysis', { method: 'POST' })
+                .catch(err => console.log('Could not clear analysis'));
+            
+            window.location.href = '/analyze';
+        }
+        
+        function shareResults(platform) {
+            const text = "I just got my " + 
+                ("{{ results.type if results else 'skin' }}" === 'skin' ? "skin" : "hair") + 
+                " analysis results from DermaCare AI! ✨";
+            const url = window.location.href;
+            
+            if (platform === 'twitter') {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            } else if (platform === 'facebook') {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            } else if (platform === 'copy') {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('✨ Link copied to clipboard!');
+                }).catch(() => {
+                    alert('Could not copy link');
+                });
+            }
+        }
+        
+        // Add a simple animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.result-card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

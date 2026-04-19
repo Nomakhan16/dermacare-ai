@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Recommendations | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .recommendations-page {
+            background: linear-gradient(135deg, #F5F0E8 0%, #E8EDE5 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 20px;
+        }
+        
+        .premium-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+        
+        .premium-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1A3B35 0%, #C6A43B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .premium-header p {
+            color: #5C6E64;
+            font-size: 0.9rem;
+        }
+        
+        .type-badge-premium {
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .type-badge-premium.skin {
+            background: rgba(27, 77, 62, 0.1);
+            color: #1A3B35;
+            border: 1px solid rgba(27, 77, 62, 0.2);
+        }
+        
+        .type-badge-premium.hair {
+            background: rgba(198, 164, 59, 0.1);
+            color: #C6A43B;
+            border: 1px solid rgba(198, 164, 59, 0.2);
+        }
+        
+        .summary-card-premium {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(198, 164, 59, 0.2);
+        }
+        
+        .summary-card-premium h2 {
+            color: #1A3B35;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .condition-tags-premium {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.2rem 0 0;
+        }
+        
+        .condition-tag-premium {
+            background: rgba(27, 77, 62, 0.08);
+            color: #1A3B35;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(27, 77, 62, 0.15);
+        }
+        
+        .section-title-premium {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1A3B35;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title-premium::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, #C6A43B, transparent);
+        }
+        
+        .products-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+        
+        .product-card-premium {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.4s;
+            border: 1px solid rgba(198, 164, 59, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1A3B35, #C6A43B);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .product-card-premium:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .product-card-premium:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(198, 164, 59, 0.35);
+        }
+        
+        .product-name-premium {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1A3B35;
+            margin-bottom: 0.3rem;
+        }
+        
+        .product-brand-premium {
+            color: #C6A43B;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .brand-tag-premium {
+            background: rgba(198, 164, 59, 0.1);
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            color: #C6A43B;
+        }
+        
+        .ingredients-section-premium {
+            margin: 1rem 0;
+            padding: 0.8rem 0;
+            border-top: 1px solid rgba(198, 164, 59, 0.15);
+            border-bottom: 1px solid rgba(198, 164, 59, 0.15);
+        }
+        
+        .ingredients-title-premium {
+            font-weight: 600;
+            color: #1A3B35;
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
+        }
+        
+        .ingredients-list-premium {
+            color: #5C6E64;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .target-tag-premium {
+            background: rgba(198, 164, 59, 0.1);
+            color: #C6A43B;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+        
+        .usage-tip-premium {
+            background: rgba(27, 77, 62, 0.05);
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid #C6A43B;
+        }
+        
+        .usage-tip-premium .tip-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #C6A43B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+        
+        .usage-tip-premium .tip-text {
+            font-size: 0.75rem;
+            color: #5C6E64;
+            line-height: 1.4;
+        }
+        
+        .product-footer-premium {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        
+        .view-details-btn-premium {
+            background: linear-gradient(135deg, #1A3B35, #2A5A50);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .view-details-btn-premium:hover {
+            background: linear-gradient(135deg, #2A5A50, #1A3B35);
+            transform: translateY(-2px);
+        }
+        
+        .no-products-premium {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(198, 164, 59, 0.2);
+        }
+        
+        .no-products-premium .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .no-products-premium h3 {
+            color: #1A3B35;
+            margin-bottom: 0.5rem;
+        }
+        
+        .no-products-premium p {
+            color: #5C6E64;
+            margin-bottom: 1.5rem;
+        }
+        
+        .action-buttons-premium {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn-premium {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn-premium.primary {
+            background: linear-gradient(135deg, #1A3B35, #2A5A50);
+            color: white;
+        }
+        
+        .action-btn-premium.secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1A3B35;
+            border: 1px solid rgba(198, 164, 59, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .products-grid-premium {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons-premium {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="recommendations-page">
+    <nav class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='images/logo-dermacare.png') }}"><span>DERMACARE</span></div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analyze">Analysis</a>
+            <a href="/recommendations" class="active">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/skin-coach">Coach</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/progress">Progress</a>
+            <a href="/history">History</a>
+           
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="premium-header">
+            <h1>✨ Curated For You</h1>
+            <p>Personalized recommendations based on your unique profile</p>
+        </div>
+        
+        <div style="text-align: center;">
+            {% if analysis_type == 'skin' %}
+            <div class="type-badge-premium skin">🧴 Skincare Recommendations</div>
+            {% else %}
+            <div class="type-badge-premium hair">💇 Haircare Recommendations</div>
+            {% endif %}
+        </div>
+        
+        <div class="summary-card-premium">
+            <h2>Your Analysis Summary</h2>
+            {% if conditions and conditions|length > 0 %}
+                <p>Based on your {% if analysis_type == 'skin' %}skin{% else %}hair{% endif %} analysis, we detected:</p>
+                <div class="condition-tags-premium">
+                    {% for condition in conditions %}
+                        <span class="condition-tag-premium">{{ condition }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Complete an analysis to see personalized recommendations.</p>
+            {% endif %}
+        </div>
+        
+        <div class="section-title-premium">
+            {% if analysis_type == 'skin' %}💊 Recommended Skincare{% else %}💇 Recommended Haircare{% endif %}
+        </div>
+        
+        <div class="products-grid-premium">
+            {% if products and products|length > 0 %}
+                {% for product in products %}
+                <div class="product-card-premium">
+                    <div class="product-name-premium">{{ product.name }}</div>
+                    <div class="product-brand-premium"><span>{{ product.brand }}</span><span class="brand-tag-premium">{{ product.category }}</span></div>
+                    <div class="ingredients-section-premium">
+                        <div class="ingredients-title-premium">Key Ingredients</div>
+                        <div class="ingredients-list-premium">{{ product.ingredients }}</div>
+                    </div>
+                    <div class="target-tag-premium">🎯 Targets: {{ product.for }}</div>
+                    
+                    <div class="usage-tip-premium">
+                        <div class="tip-title">💡 Usage Tip</div>
+                        <div class="tip-text">
+                            {% if 'Cleanser' in product.category %}
+                                Use twice daily. Massage onto damp skin for 30 seconds, then rinse.
+                            {% elif 'Moisturizer' in product.category %}
+                                Apply twice daily on slightly damp skin. Use pea-sized amount.
+                            {% elif 'Serum' in product.category %}
+                                Apply once or twice daily on clean skin before moisturizer. Use 2-3 drops.
+                            {% elif 'Treatment' in product.category %}
+                                Apply once daily at night. Start with 2-3 times per week.
+                            {% elif 'Shampoo' in product.category %}
+                                Apply to wet hair, massage scalp for 2-3 minutes, rinse. Use 2-3 times per week.
+                            {% elif 'Hair Oil' in product.category %}
+                                Apply to scalp and massage. Leave for 30 minutes, then shampoo. Use 1-2 times per week.
+                            {% else %}
+                                Use as directed. Start with a patch test.
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="product-footer-premium">
+                        <button class="view-details-btn-premium" onclick="viewProductDetails('{{ product.name }}')">View Details →</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-products-premium">
+                    <div class="icon">🧴</div>
+                    <h3>No Recommendations Yet</h3>
+                    <p>Complete an analysis first to see personalized products</p>
+                    <a href="/analyze" class="action-btn-premium primary">Start Analysis →</a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="action-buttons-premium">
+            <a href="/analyze" class="action-btn-premium secondary">← New Analysis</a>
+            <a href="/dashboard" class="action-btn-premium primary">Go to Dashboard</a>
+        </div>
+    </div>
+    
+    <footer class="footer"><p>© 2026 DermaCare AI — Intelligent Skin & Hair Analysis</p></footer>
+    
+    <script>
+        function viewProductDetails(productName) {
+            alert(`✨ ${productName}\n\n• Full ingredients list\n• How to use\n• Customer reviews\n• Where to buy`);
+        }
+    </script>
+</body>
+</html>

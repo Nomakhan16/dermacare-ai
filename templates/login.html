@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FDFCF8 0%, #F5F0E8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .login-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }
+
+        .login-left {
+            background: linear-gradient(135deg, #1A3B35 0%, #2A5A50 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .login-left h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-left p {
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .login-right {
+            padding: 3rem;
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        .login-right h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #1A3B35;
+        }
+
+        .login-right p {
+            color: #8A7E6E;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1A3B35;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #C6A43B;
+            box-shadow: 0 0 0 3px rgba(198,164,59,0.1);
+        }
+
+        /* CAPTCHA Styles */
+        .captcha-container {
+            background: #F5F0E8;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .captcha-image {
+            margin-bottom: 1rem;
+        }
+
+        .captcha-image img {
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            width: 250px;
+            height: 80px;
+            background: white;
+        }
+
+        .captcha-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .captcha-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .refresh-captcha {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: #C6A43B;
+        }
+
+        .error-message {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1A3B35 0%, #C6A43B 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(198,164,59,0.3);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #8A7E6E;
+        }
+
+        .signup-link a {
+            color: #C6A43B;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #8A7E6E;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-home:hover {
+            color: #C6A43B;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your personalized skin and hair analysis dashboard.</p>
+        </div>
+        <div class="login-right">
+            <h2>Sign In</h2>
+            <p>Enter your credentials to continue</p>
+            
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <form method="POST" action="{{ url_for('login') }}">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <!-- CAPTCHA Section -->
+                <div class="captcha-container">
+                    <div class="captcha-image">
+                        <img src="data:image/png;base64,{{ captcha_image }}" alt="CAPTCHA">
+                    </div>
+                    <div class="captcha-input">
+                        <input type="text" name="captcha_text" placeholder="Enter the code above" required autocomplete="off">
+                        <button type="button" class="refresh-captcha" onclick="refreshCaptcha()">🔄</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login">Sign In →</button>
+            </form>
+            <div class="signup-link">
+                Don't have an account? <a href="{{ url_for('signup') }}">Create Account</a>
+            </div>
+            <a href="/" class="back-home">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function refreshCaptcha() {
+            fetch('/refresh-captcha')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.captcha-image img').src = 'data:image/png;base64,' + data.image;
+                });
+        }
+    </script>
+</body>
+</html>

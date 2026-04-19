@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DermaCare AI - Smart Skin Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--beige) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+        }
+        
+        .hero-logo {
+            margin-bottom: 2rem;
+        }
+        
+        .hero-logo img {
+            height: 80px;
+            width: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-logo h1 {
+            font-size: 3rem;
+            color: var(--primary-dark);
+            letter-spacing: -1px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--taupe);
+            margin: 2rem 0;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .features {
+            padding: 4rem 2rem;
+            background: white;
+        }
+        
+        .features h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+            color: var(--primary-dark);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-item h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+        
+        .feature-item p {
+            color: var(--taupe);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-logo h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <img src="{{ url_for('static', filename='images/logo-dermacare.png') }}" alt="DermaCare">
+                <h1>DERMACARE AI</h1>
+            </div>
+            <p>Intelligent skin analysis powered by artificial intelligence.<br>
+            Get personalized skincare recommendations in seconds.</p>
+            
+            <div class="hero-buttons">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Sign In</a>
+                <a href="{{ url_for('signup') }}" class="btn btn-outline">Create Account</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="features">
+        <h2>How It Works</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">📸</div>
+                <h3>Take Photos</h3>
+                <p>Upload or take 2 photos of your face using camera</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Analysis</h3>
+                <p>Our AI detects skin problems like acne, dryness, wrinkles</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">💊</div>
+                <h3>Get Products</h3>
+                <p>Receive personalized product recommendations</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <h3>Track Progress</h3>
+                <p>Monitor your skin health over time</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>© 2026 DermaCare AI - Intelligent Skin Analysis</p>
+    </footer>
+</body>
+</html>

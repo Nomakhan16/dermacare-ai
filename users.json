@@ -1,0 +1,16 @@
+{
+  "demo@test.com": {
+    "password": "demo123",
+    "name": "Demo User",
+    "skin_type": "Combination",
+    "created": "2026-03-05"
+  },
+  "nomakhanofficial@gmail.com": {
+    "password": "noma@16",
+    "name": "Noma Khan",
+    "skin_type": "Normal",
+    "created": "2026-03-05",
+    "analyses": [],
+    "history": []
+  }
+}

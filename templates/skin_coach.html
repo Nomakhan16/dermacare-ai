@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skin Coach | DermaCare AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .coach-container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #1A3B35 0%, #2A5A50 100%);
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 50%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(198,164,59,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .hero-content p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .condition-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .condition-badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: #C6A43B;
+            font-weight: 500;
+            border: 1px solid rgba(198,164,59,0.3);
+        }
+
+        /* Stats Row - 3 columns instead of 4 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid rgba(198,164,59,0.15);
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: #C6A43B;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        .stat-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1A3B35 0%, #C6A43B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #8A7E6E;
+            margin-top: 0.3rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1A3B35;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-header h2 i {
+            color: #C6A43B;
+            font-size: 1.3rem;
+        }
+
+        /* Routine Grid */
+        .routine-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .routine-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(198,164,59,0.12);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .routine-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(198,164,59,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+
+        .routine-header {
+            background: linear-gradient(135deg, #1A3B35 0%, #2A5A50 100%);
+            padding: 1rem 1.2rem;
+        }
+
+        .routine-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .routine-header h3 i {
+            color: #C6A43B;
+        }
+
+        .routine-body {
+            padding: 1.2rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #F0EBE4;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid #C6A43B;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-check.completed {
+            background: #C6A43B;
+            position: relative;
+        }
+
+        .task-check.completed::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.85rem;
+            color: #2C3E35;
+            line-height: 1.4;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #B0A89E;
+        }
+
+        /* Tips Grid */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tip-card {
+            background: white;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid rgba(198,164,59,0.12);
+            transition: all 0.3s;
+        }
+
+        .tip-card:hover {
+            border-color: rgba(198,164,59,0.3);
+            transform: translateX(5px);
+        }
+
+        .tip-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(27,77,62,0.1) 0%, rgba(198,164,59,0.1) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .tip-content {
+            flex: 1;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            color: #1A3B35;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .tip-desc {
+            font-size: 0.75rem;
+            color: #8A7E6E;
+            line-height: 1.4;
+        }
+
+        /* Products Sections */
+        .products-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(198,164,59,0.12);
+        }
+
+        .products-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1A3B35;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .products-title i {
+            font-size: 1.1rem;
+        }
+
+        .products-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .product-tag {
+            background: rgba(27, 77, 62, 0.08);
+            color: #1A3B35;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .product-tag:hover {
+            background: #1A3B35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .product-tag.avoid {
+            background: rgba(231, 111, 81, 0.1);
+            color: #E76F51;
+        }
+
+        .product-tag.avoid:hover {
+            background: #E76F51;
+            color: white;
+        }
+
+        /* Streak Section */
+        .streak-section {
+            background: linear-gradient(135deg, #F5F0E8 0%, #EDE6DC 100%);
+            border-radius: 24px;
+            padding: 1.8rem;
+            text-align: center;
+            border: 1px solid rgba(198,164,59,0.2);
+        }
+
+        .streak-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1A3B35 0%, #C6A43B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .streak-label {
+            color: #8A7E6E;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .streak-btn {
+            background: linear-gradient(135deg, #1A3B35, #2A5A50);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .streak-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(27, 77, 62, 0.25);
+        }
+
+        @media (max-width: 900px) {
+            .routine-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-dermacare.png') }}" alt="DermaCare">
+            <span>DERMACARE</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analyze">Analysis</a>
+            <a href="/recommendations">Products</a>
+            <a href="/progress">Progress</a>
+            <a href="/history">History</a>
+            <a href="/chatbot">Assistant</a>
+            <a href="/skin-coach" class="active">Coach</a>
+            <a href="/logout" style="color: #E76F51;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="coach-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1><i class="fas fa-crown" style="color: #C6A43B;"></i> Your AI Skin Coach</h1>
+                <p>Personalized daily routine crafted just for your unique skin profile</p>
+                {% if conditions %}
+                <div class="condition-badges">
+                    {% for condition in conditions %}
+                    <span class="condition-badge">{{ condition }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stats Row - 3 columns only -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-number">{{ daily_plan.morning|length + daily_plan.afternoon|length + daily_plan.evening|length }}</div>
+                <div class="stat-label">TOTAL TASKS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="completedCount">0</div>
+                <div class="stat-label">COMPLETED TODAY</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-number" id="streakCount">0</div>
+                <div class="stat-label">DAY STREAK</div>
+            </div>
+        </div>
+
+        <!-- Daily Routine -->
+        <div class="section-header">
+            <h2><i class="fas fa-calendar-alt"></i> Today's Routine</h2>
+        </div>
+        <div class="routine-grid">
+            <!-- Morning -->
+            <div class="routine-card">
+                <div class="routine-header">
+                    <h3><i class="fas fa-sun"></i> Morning Ritual</h3>
+                </div>
+                <div class="routine-body">
+                    {% for step in daily_plan.morning %}
+                    <div class="task-item">
+                        <div class="task-check" onclick="toggleTask(this)"></div>
+                        <span class="task-text">{{ step }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Afternoon -->
+            <div class="routine-card">
+                <div class="routine-header">
+                    <h3><i class="fas fa-cloud-sun"></i> Midday Check</h3>
+                </div>
+                <div class="routine-body">
+                    {% for step in daily_plan.afternoon %}
+                    <div class="task-item">
+                        <div class="task-check" onclick="toggleTask(this)"></div>
+                        <span class="task-text">{{ step }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Evening -->
+            <div class="routine-card">
+                <div class="routine-header">
+                    <h3><i class="fas fa-moon"></i> Evening Wind Down</h3>
+                </div>
+                <div class="routine-body">
+                    {% for step in daily_plan.evening %}
+                    <div class="task-item">
+                        <div class="task-check" onclick="toggleTask(this)"></div>
+                        <span class="task-text">{{ step }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pro Tips -->
+        <div class="section-header">
+            <h2><i class="fas fa-gem" style="color: #C6A43B;"></i> Expert Insights</h2>
+        </div>
+        <div class="tips-grid">
+            {% for tip in daily_plan.tips %}
+            <div class="tip-card">
+                <div class="tip-icon">✨</div>
+                <div class="tip-content">
+                    <div class="tip-title">Derma Tip</div>
+                    <div class="tip-desc">{{ tip }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Products -->
+        <div class="products-section">
+            <div class="products-title"><i class="fas fa-star" style="color: #C6A43B;"></i> Recommended For You</div>
+            <div class="products-tags">
+                {% for product in daily_plan.products_to_use %}
+                <span class="product-tag">{{ product }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if daily_plan.products_to_avoid %}
+        <div class="products-section">
+            <div class="products-title"><i class="fas fa-exclamation-triangle" style="color: #E76F51;"></i> Best to Avoid</div>
+            <div class="products-tags">
+                {% for product in daily_plan.products_to_avoid %}
+                <span class="product-tag avoid">{{ product }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Streak -->
+        <div class="streak-section">
+            <div class="streak-number" id="streakDisplay">0</div>
+            <div class="streak-label">Consistency Streak</div>
+            <button class="streak-btn" onclick="markComplete()">
+                <i class="fas fa-check-circle"></i> Mark Today Complete
+            </button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 DermaCare AI — Your Personal Skin Coach</p>
+    </footer>
+
+    <script>
+        let streak = parseInt(localStorage.getItem('skinCoachStreak')) || 0;
+        let lastDate = localStorage.getItem('lastCoachDate');
+        let completedTasks = JSON.parse(localStorage.getItem('completedCoachTasks')) || [];
+
+        function updateStreakDisplay() {
+            document.getElementById('streakCount').innerText = streak;
+            document.getElementById('streakDisplay').innerText = streak;
+        }
+
+        function loadCompletedTasks() {
+            const today = new Date().toDateString();
+            const todayTasks = completedTasks.filter(t => t.date === today);
+            
+            document.querySelectorAll('.task-check').forEach((check, index) => {
+                const taskText = check.parentElement.querySelector('.task-text');
+                const isCompleted = todayTasks.some(t => t.taskIndex === index);
+                
+                if (isCompleted) {
+                    check.classList.add('completed');
+                    taskText.classList.add('completed');
+                } else {
+                    check.classList.remove('completed');
+                    taskText.classList.remove('completed');
+                }
+            });
+            
+            document.getElementById('completedCount').innerText = todayTasks.length;
+        }
+
+        function toggleTask(element) {
+            const today = new Date().toDateString();
+            const taskIndex = Array.from(document.querySelectorAll('.task-check')).indexOf(element);
+            const taskText = element.parentElement.querySelector('.task-text');
+            
+            if (element.classList.contains('completed')) {
+                element.classList.remove('completed');
+                taskText.classList.remove('completed');
+                completedTasks = completedTasks.filter(t => !(t.date === today && t.taskIndex === taskIndex));
+            } else {
+                element.classList.add('completed');
+                taskText.classList.add('completed');
+                completedTasks.push({ date: today, taskIndex: taskIndex });
+            }
+            
+            localStorage.setItem('completedCoachTasks', JSON.stringify(completedTasks));
+            const todayTasks = completedTasks.filter(t => t.date === today);
+            document.getElementById('completedCount').innerText = todayTasks.length;
+        }
+
+        function markComplete() {
+            const today = new Date().toDateString();
+            
+            if (lastDate === today) {
+                alert("You've already completed today's routine! 🌟");
+                return;
+            }
+            
+            document.querySelectorAll('.task-check').forEach((check, index) => {
+                if (!check.classList.contains('completed')) {
+                    check.classList.add('completed');
+                    check.parentElement.querySelector('.task-text').classList.add('completed');
+                    completedTasks.push({ date: today, taskIndex: index });
+                }
+            });
+            
+            localStorage.setItem('completedCoachTasks', JSON.stringify(completedTasks));
+            
+            streak = streak + 1;
+            localStorage.setItem('skinCoachStreak', streak);
+            localStorage.setItem('lastCoachDate', today);
+            lastDate = today;
+            
+            updateStreakDisplay();
+            document.getElementById('completedCount').innerText = completedTasks.filter(t => t.date === today).length;
+            
+            alert("🎉 Amazing! Your streak continues! Keep glowing ✨");
+        }
+
+        function checkStreak() {
+            const today = new Date().toDateString();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toDateString();
+            
+            if (lastDate && lastDate !== today && lastDate !== yesterdayStr) {
+                streak = 0;
+                localStorage.setItem('skinCoachStreak', streak);
+                completedTasks = [];
+                localStorage.setItem('completedCoachTasks', JSON.stringify(completedTasks));
+            }
+            
+            updateStreakDisplay();
+            loadCompletedTasks();
+        }
+
+        checkStreak();
+    </script>
+</body>
+</html>
