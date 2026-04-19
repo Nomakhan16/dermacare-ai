@@ -1,17 +1,27 @@
 # database.py
+import os
 from pymongo import MongoClient
 from datetime import datetime
 
 class Database:
     def __init__(self):
-        self.client = MongoClient('mongodb://localhost:27017/')
+        # Get MongoDB URI from environment variable
+        mongodb_uri = os.environ.get('MONGODB_URI')
+        
+        # If no environment variable, fall back to localhost (for development)
+        if not mongodb_uri:
+            print("⚠️ MONGODB_URI not set, using localhost (development mode)")
+            mongodb_uri = 'mongodb://localhost:27017/'
+        
+        # Connect to MongoDB
+        self.client = MongoClient(mongodb_uri)
         self.db = self.client['dermacare_db']
         self.users = self.db['users']
         self.products = self.db['products']
         
         # Create index on email for faster lookup
         self.users.create_index('email', unique=True)
-        print("✅ Connected to MongoDB")
+        print(f"✅ Connected to MongoDB (host: {mongodb_uri[:30]}...)")
     
     def get_user(self, email):
         return self.users.find_one({'email': email})
